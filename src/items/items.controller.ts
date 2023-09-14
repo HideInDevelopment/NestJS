@@ -8,13 +8,25 @@ import {
   Param,
   Post,
   Res,
+  UseFilters,
+  UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateItemDto } from 'src/modules/dtos';
 import { Response } from 'express';
+import { CustomExceptionFilter } from 'src/utils/custom-exception-filter';
+import { TransformInterceptor } from 'src/utils/transform-interceptor';
 
 @Controller('items')
+@UseFilters(new CustomExceptionFilter())
+@UseInterceptors(TransformInterceptor)
 export class ItemsController {
   private readonly items = [];
+
+  @Get()
+  findAll() {
+    return ['item1', 'item2'];
+  }
 
   @Get(':name')
   findOne(@Param('name') name: string): string {
@@ -25,7 +37,10 @@ export class ItemsController {
   }
 
   @Post()
-  create(@Body() createItemDto: CreateItemDto, @Res() res: Response) {
+  create(
+    @Body(new ValidationPipe()) createItemDto: CreateItemDto,
+    @Res() res: Response,
+  ) {
     const exists = this.items.find((item) => item.name === createItemDto.name);
 
     if (exists)
