@@ -46,6 +46,7 @@ export class ItemsController {
     if (exists)
       throw new HttpException('Item already exists', HttpStatus.BAD_REQUEST);
     //Here goes the logic to save the item
+
     const newItem = {
       id: Date.now(),
       ...createItemDto,
